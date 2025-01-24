@@ -80,7 +80,7 @@ export const ForgotPasswordDialog = ({ open, onOpenChange }: ForgotPasswordDialo
         <form onSubmit={handleSubmit} className="space-y-4">
           <div className="bg-yellow-500/10 border border-yellow-500/20 rounded-md p-3 mb-4">
             <p className="text-yellow-500 text-sm">
-              If you don't receive the email within a few minutes, please wait up to 15 minutes before trying again. Check your spam folder as well.
+              Allow up to 15 minutes before retrying.
             </p>
           </div>
           <div>
