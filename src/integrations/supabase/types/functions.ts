@@ -82,6 +82,11 @@ export type DatabaseFunctions = {
       lockout_duration: string;
     };
   };
+  
+  validate_reset_token: {
+    Args: { token_value: string };
+    Returns: boolean;
+  };
 
   validate_user_roles: {
     Args: Record<PropertyKey, never>;

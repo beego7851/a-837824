@@ -26,8 +26,9 @@ const passwordSchema = z.object({
 interface PasswordFormProps {
   onSubmit?: (values: PasswordFormValues) => Promise<void>;
   memberNumber: string;
-  onCancel: () => void;
+  onCancel?: () => void;
   onSuccess?: () => void;
+  hideCurrentPassword?: boolean;
 }
 
 export const PasswordForm = ({
@@ -35,6 +36,7 @@ export const PasswordForm = ({
   memberNumber,
   onCancel,
   onSuccess,
+  hideCurrentPassword = false,
 }: PasswordFormProps) => {
   const form = useForm<PasswordFormValues>({
     resolver: zodResolver(passwordSchema),
@@ -71,13 +73,15 @@ export const PasswordForm = ({
   return (
     <Form {...form}>
       <form onSubmit={form.handleSubmit(handleFormSubmit)} className="space-y-4">
-        <PasswordInput
-          form={form}
-          name="currentPassword"
-          label="Current Password"
-          disabled={isSubmitting}
-          required
-        />
+        {!hideCurrentPassword && (
+          <PasswordInput
+            form={form}
+            name="currentPassword"
+            label="Current Password"
+            disabled={isSubmitting}
+            required
+          />
+        )}
         
         <PasswordInput
           form={form}
@@ -96,15 +100,17 @@ export const PasswordForm = ({
         />
 
         <div className="flex justify-end space-x-4 pt-4">
-          <Button
-            type="button"
-            variant="outline"
-            onClick={onCancel}
-            disabled={isSubmitting}
-            className="bg-dashboard-dark hover:bg-dashboard-cardHover hover:text-white border-dashboard-cardBorder transition-all duration-200"
-          >
-            Cancel
-          </Button>
+          {onCancel && (
+            <Button
+              type="button"
+              variant="outline"
+              onClick={onCancel}
+              disabled={isSubmitting}
+              className="bg-dashboard-dark hover:bg-dashboard-cardHover hover:text-white border-dashboard-cardBorder transition-all duration-200"
+            >
+              Cancel
+            </Button>
+          )}
           <Button
             type="submit"
             disabled={isSubmitting}
