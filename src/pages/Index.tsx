@@ -6,8 +6,6 @@ import MemberSearch from '@/components/MemberSearch';
 import SystemToolsView from '@/components/SystemToolsView';
 import CollectorFinancialsView from '@/components/CollectorFinancialsView';
 import { useRoleAccess } from '@/hooks/useRoleAccess';
-import { useToast } from "@/hooks/use-toast";
-import MainLayout from '@/components/layout/MainLayout';
 import InvalidateRolesButton from '@/components/debug/InvalidateRolesButton';
 
 const Index = () => {
@@ -48,16 +46,7 @@ const Index = () => {
     }
   };
 
-  return (
-    <MainLayout 
-      activeTab={activeTab} 
-      isSidebarOpen={true} 
-      onSidebarToggle={() => {}} 
-      onTabChange={setActiveTab}
-    >
-      {renderContent()}
-    </MainLayout>
-  );
+  return renderContent();
 };
 
 export default Index;
