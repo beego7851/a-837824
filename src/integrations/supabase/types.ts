@@ -692,6 +692,53 @@ export type Database = {
         }
         Relationships: []
       }
+      password_reset_tokens: {
+        Row: {
+          attempts: number
+          created_at: string
+          expires_at: string
+          id: string
+          invalidated_at: string | null
+          member_number: string | null
+          token: string
+          token_type: Database["public"]["Enums"]["token_type"]
+          used_at: string | null
+          user_id: string | null
+        }
+        Insert: {
+          attempts?: number
+          created_at?: string
+          expires_at?: string
+          id?: string
+          invalidated_at?: string | null
+          member_number?: string | null
+          token: string
+          token_type?: Database["public"]["Enums"]["token_type"]
+          used_at?: string | null
+          user_id?: string | null
+        }
+        Update: {
+          attempts?: number
+          created_at?: string
+          expires_at?: string
+          id?: string
+          invalidated_at?: string | null
+          member_number?: string | null
+          token?: string
+          token_type?: Database["public"]["Enums"]["token_type"]
+          used_at?: string | null
+          user_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "password_reset_tokens_member_number_fkey"
+            columns: ["member_number"]
+            isOneToOne: false
+            referencedRelation: "members"
+            referencedColumns: ["member_number"]
+          },
+        ]
+      }
       payment_requests: {
         Row: {
           amount: number
@@ -1035,6 +1082,10 @@ export type Database = {
           details: Json
         }[]
       }
+      cleanup_expired_tokens: {
+        Args: Record<PropertyKey, never>
+        Returns: undefined
+      }
       create_auth_user_for_collector: {
         Args: {
           member_num: string
@@ -1055,6 +1106,13 @@ export type Database = {
       generate_full_backup: {
         Args: Record<PropertyKey, never>
         Returns: Json
+      }
+      generate_password_reset_token: {
+        Args: {
+          p_member_number: string
+          p_token_type?: Database["public"]["Enums"]["token_type"]
+        }
+        Returns: string
       }
       generate_payment_number: {
         Args: Record<PropertyKey, never>
@@ -1157,6 +1215,10 @@ export type Database = {
         Args: Record<PropertyKey, never>
         Returns: undefined
       }
+      manual_cleanup_expired_tokens: {
+        Args: Record<PropertyKey, never>
+        Returns: number
+      }
       perform_user_roles_sync: {
         Args: Record<PropertyKey, never>
         Returns: undefined
@@ -1189,11 +1251,26 @@ export type Database = {
         Args: Record<PropertyKey, never>
         Returns: undefined
       }
+      use_reset_token: {
+        Args: {
+          token_value: string
+        }
+        Returns: {
+          member_number: string
+          user_id: string
+        }[]
+      }
       validate_password_complexity: {
         Args: {
           password: string
         }
         Returns: Json
+      }
+      validate_reset_token: {
+        Args: {
+          token_value: string
+        }
+        Returns: boolean
       }
       validate_user_roles: {
         Args: Record<PropertyKey, never>
@@ -1233,6 +1310,7 @@ export type Database = {
         | "connection_count"
         | "cache_hit_ratio"
       severity_level: "info" | "warning" | "error" | "critical"
+      token_type: "password_reset" | "email_verification"
     }
     CompositeTypes: {
       [_ in never]: never
