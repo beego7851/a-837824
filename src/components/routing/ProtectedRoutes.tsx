@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation, Outlet } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { Session } from "@supabase/supabase-js";
 import { useToast } from "@/hooks/use-toast";
@@ -7,10 +7,6 @@ import { useRoleAccess } from "@/hooks/useRoleAccess";
 import { useRoleSync } from "@/hooks/useRoleSync";
 import { Loader2 } from "lucide-react";
 import MainLayout from "@/components/layout/MainLayout";
-import DashboardView from "@/components/DashboardView";
-import MembersList from "@/components/MembersList";
-import FinancialsView from "@/components/FinancialsView";
-import SystemToolsView from "@/components/SystemToolsView";
 
 interface ProtectedRoutesProps {
   session: Session | null;
@@ -18,12 +14,24 @@ interface ProtectedRoutesProps {
 
 const ProtectedRoutes = ({ session }: ProtectedRoutesProps) => {
   const navigate = useNavigate();
+  const location = useLocation();
   const { toast } = useToast();
   const { roleLoading, hasRole, userRole } = useRoleAccess();
   const { syncRoles } = useRoleSync();
-  const [activeTab, setActiveTab] = useState('dashboard');
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [isInitialLoad, setIsInitialLoad] = useState(true);
+
+  // Convert path to tab
+  const pathToTab = (path: string) => {
+    const cleanPath = path.split('/')[1] || 'dashboard';
+    return cleanPath;
+  };
+
+  const [activeTab, setActiveTab] = useState(pathToTab(location.pathname));
+
+  useEffect(() => {
+    setActiveTab(pathToTab(location.pathname));
+  }, [location.pathname]);
 
   useEffect(() => {
     console.log('ProtectedRoutes mounted, session:', !!session);
@@ -79,31 +87,10 @@ const ProtectedRoutes = ({ session }: ProtectedRoutesProps) => {
     return null;
   }
 
-  console.log('Rendering protected content with role:', userRole);
-
-  const renderContent = () => {
-    console.log('Rendering content for tab:', activeTab);
-    switch (activeTab) {
-      case 'dashboard':
-        return <DashboardView />;
-      case 'users':
-        if (hasRole('admin') || hasRole('collector')) {
-          return <MembersList searchTerm="" userRole={userRole} />;
-        }
-        return null;
-      case 'financials':
-        if (hasRole('admin')) {
-          return <FinancialsView />;
-        }
-        return null;
-      case 'system':
-        if (hasRole('admin')) {
-          return <SystemToolsView />;
-        }
-        return null;
-      default:
-        return <DashboardView />;
-    }
+  const handleTabChange = (tab: string) => {
+    const path = tab === 'dashboard' ? '/' : `/${tab}`;
+    navigate(path);
+    setActiveTab(tab);
   };
 
   return (
@@ -111,9 +98,9 @@ const ProtectedRoutes = ({ session }: ProtectedRoutesProps) => {
       activeTab={activeTab}
       isSidebarOpen={isSidebarOpen}
       onSidebarToggle={() => setIsSidebarOpen(!isSidebarOpen)}
-      onTabChange={setActiveTab}
+      onTabChange={handleTabChange}
     >
-      {renderContent()}
+      <Outlet />
     </MainLayout>
   );
 };

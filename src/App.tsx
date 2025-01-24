@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from 'react';
-import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
+import { BrowserRouter as Router, Routes, Route, Navigate, useLocation } from 'react-router-dom';
 import { useEnhancedRoleAccess } from '@/hooks/useEnhancedRoleAccess';
 import { useAuthSession } from '@/hooks/useAuthSession';
 import { Toaster } from "@/components/ui/toaster";
@@ -7,6 +7,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { AlertCircle } from 'lucide-react';
 import { Alert, AlertTitle, AlertDescription } from "@/components/ui/alert";
 import Login from '@/pages/Login';
+import ResetPassword from '@/pages/ResetPassword';
 import Index from '@/pages/Index';
 import ProtectedRoutes from '@/components/routing/ProtectedRoutes';
 
@@ -82,8 +83,13 @@ function App() {
     <Router>
       <Routes>
         <Route path="/login" element={!session ? <Login /> : <Navigate to="/" replace />} />
-        <Route path="/" element={<ProtectedRoutes session={session} />}>
-          <Route index element={<Index />} />
+        <Route path="/reset-password" element={<ResetPassword />} />
+        <Route path="/*" element={<ProtectedRoutes session={session} />}>
+          <Route index element={<Navigate to="/dashboard" replace />} />
+          <Route path="dashboard" element={<Index />} />
+          <Route path="users" element={<Index />} />
+          <Route path="financials" element={<Index />} />
+          <Route path="system" element={<Index />} />
         </Route>
       </Routes>
       <Toaster />
